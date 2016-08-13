@@ -1,5 +1,4 @@
-# rtsp
-# R Lib: Real Travelling Salesman Problem
+# rtsp - an R Library: Real Travelling Salesman Problem
 
 # Usage example:
 
