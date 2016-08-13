@@ -1,4 +1,4 @@
-library("rjson")
+require("rjson")
 require("GA")
 
 rtsp <- function(mypoints,calctype="meter",startpoint=NULL,endpoint=NULL){
