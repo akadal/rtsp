@@ -4,5 +4,9 @@
 # Usage example:
 
 source("rtsp.R")
+
+
 mypoints <- c("İstanbul", "Ankara", "İzmir")
+
+
 rtsp(mypoints)
