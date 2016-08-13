@@ -9,3 +9,10 @@ mypoints <- c("İstanbul", "Ankara", "İzmir")
 
 
 rtsp(mypoints)
+
+------------------------
+
+mypoints <- c("Bodrum", "Antalya", "Çeşme")
+
+rtsp(mypoints, startpoint="İstanbul", endpoint="İstanbul")
+
