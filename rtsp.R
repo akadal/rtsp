@@ -1,22 +1,22 @@
 require("rjson")
 require("GA")
 
-rtsp <- function(mypoints,calctype="meter",startpoint=NULL,endpoint=NULL){
+rtsp <- function(mypoints, calctype="meter", startpoint=NULL, endpoint=NULL) {
   
   # including start point
   if (!is.null(startpoint)){
-    mypoints <- c(startpoint,mypoints)
+    mypoints <- c(startpoint, mypoints)
   }
   
   # including end point
   if (!is.null(endpoint)){
-    mypoints <- c(mypoints,endpoint)
+    mypoints <- c(mypoints, endpoint)
   }
   
   # getting matrix from web service
-  if (calctype=="time"){
-    mymatrix <- createMapMatrix(mypoints,type = "time")
-  }else{
+  if (calctype == "time"){
+    mymatrix <- createMapMatrix(mypoints, type = "time")
+  } else {
     mymatrix <- createMapMatrix(mypoints)
   }
   
@@ -46,7 +46,7 @@ rtsp <- function(mypoints,calctype="meter",startpoint=NULL,endpoint=NULL){
 } 
 
 
-createMapMatrix <- function(mypoints,calctype="meter",mode="driving") {
+createMapMatrix <- function(mypoints, calctype="meter", mode="driving") {
   
   meterinfo <- c()
   timeinfo <- c()
@@ -55,9 +55,9 @@ createMapMatrix <- function(mypoints,calctype="meter",mode="driving") {
   
   for (i in 1:length(mypoints)){
     for (j in 1:length(mypoints)){
-      if (i==j) {
-        meterinfo  <- c(meterinfo,0)
-        timeinfo <- c(timeinfo,0)
+      if (i == j) {
+        meterinfo  <- c(meterinfo, 0)
+        timeinfo <- c(timeinfo, 0)
       } else {
         url_base <- paste("https://maps.googleapis.com/maps/api/distancematrix/json?origins=",
                           mypoints[i],
@@ -66,29 +66,28 @@ createMapMatrix <- function(mypoints,calctype="meter",mode="driving") {
                           "&mode=",
                           mode,
                           "&language=en-En",
-                          sep="")
+                          sep = "")
         
         
         #print (url_base)
         json_file <- url_base
-        json_data <- fromJSON(paste(readLines(json_file), collapse=""))
+        json_data <- fromJSON(paste(readLines(json_file), collapse = ""))
         
         
         m  <- json_data$rows[[1]]$elements[[1]]$distance$value
-        #print(m)
         sn <- json_data$rows[[1]]$elements[[1]]$duration$value
         
         if (is.null(m)) {
-          meterinfo  <- c(meterinfo,NULL)
+          meterinfo  <- c(meterinfo, NULL)
         } else {
-          meterinfo  <- c(meterinfo,m)
+          meterinfo  <- c(meterinfo, m)
         }
         
         
         if (is.null(sn)) {
-          timeinfo  <- c(timeinfo,NULL)
+          timeinfo  <- c(timeinfo, NULL)
         } else {
-          timeinfo  <- c(timeinfo,sn)
+          timeinfo  <- c(timeinfo, sn)
         }
         
         
@@ -98,31 +97,31 @@ createMapMatrix <- function(mypoints,calctype="meter",mode="driving") {
   
   print("data is received.")
   
-  if (calctype=="time") {
-    return(matrix(timeinfo,length(mypoints),length(mypoints)) )
+  if (calctype == "time") {
+    return(matrix(timeinfo, length(mypoints), length(mypoints)) )
   } else {
-    return(matrix(meterinfo,length(mypoints),length(mypoints)) )
+    return(matrix(meterinfo, length(mypoints), length(mypoints)) )
   }
 }
 
 
-rtspfitnessfunction <- function (x,mymatrix,startpoint,endpoint,mypoints) {
+rtspfitnessfunction <- function (x, mymatrix, startpoint, endpoint, mypoints) {
   
   # calculating cost
   total <- 0
-  for (ss in 1:(length(x)-1)) {
-    total <- total + mymatrix[x[ss],x[(ss+1)]]
+  for (ss in 1:(length(x) - 1)) {
+    total <- total + mymatrix[x[ss], x[(ss+1)]]
   }
   
   # hard constraint
-  if (!is.null(startpoint) && (mypoints[x[1]]!=startpoint)) {
-    total <- total + 99999999 # longer than the longest distance between any two places on eart!
+  if (!is.null(startpoint) && (mypoints[x[1]] != startpoint)) {
+    total <- .Machine$double.xmax
   }
   
   # hard constraint
   if(!is.null(endpoint) && (mypoints[x[length(x)]]!=endpoint) ){
     #print (total)
-    total <- total + 99999999 # longer than the longest distance between any two places on eart!
+    total <- .Machine$double.xmax
   } 
   
   return(-total)
